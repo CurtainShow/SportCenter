@@ -1,0 +1,194 @@
+{
+    "Lundi": {
+        "Fitness": [{
+            "id": 1,
+            "name": "Renforcement",
+            "time": "12h15",
+            "available": true
+        }, {
+            "id": 2,
+            "name": "Step",
+            "time": "17h15",
+            "available": true
+        }, {
+            "id": 3,
+            "name": "Renforcement",
+            "time": "18h00",
+            "available": true
+        }],
+        "Bien-\u00eatre": [{
+            "id": 4,
+            "name": "R\u00e9veil Mulculaire",
+            "time": "07h30",
+            "available": true
+        }, {
+            "id": 5,
+            "name": "Stretching",
+            "time": "13h00",
+            "available": true
+        }],
+        "Raquettes": [{
+            "id": 6,
+            "name": "Badminton",
+            "time": "12h00",
+            "available": true
+        }, {
+            "id": 7,
+            "name": "Badminton",
+            "time": "17h00",
+            "available": true
+        }, {
+            "id": 8,
+            "name": "Squash",
+            "time": "12h00",
+            "available": true
+        }],
+        "\u00c9quilibre & Concentration": [{
+            "id": 9,
+            "name": "Escalade",
+            "time": "18h00",
+            "available": true
+        }]
+    },
+    "Mardi": {
+        "Fitness": [{
+            "id": 10,
+            "name": "Circuit Training",
+            "time": "07h30",
+            "available": true
+        }, {
+            "id": 11,
+            "name": "Body Barre",
+            "time": "12h15",
+            "available": true
+        }, {
+            "id": 12,
+            "name": "Step",
+            "time": "17h15",
+            "available": true
+        }, {
+            "id": 13,
+            "name": "Circuit Training",
+            "time": "18h00",
+            "available": true
+        }],
+        "Bien-\u00eatre": [{
+            "id": 14,
+            "name": "Yoga",
+            "time": "18h00",
+            "available": true
+        }],
+        "Cardio": [{
+            "id": 15,
+            "name": "RPM",
+            "time": "13h00",
+            "available": true
+        }],
+        "Raquettes": [{
+            "id": 16,
+            "name": "Tennis de table",
+            "time": "12h00",
+            "available": true
+        }],
+        "\u00c9quilibre & Concentration": [{
+            "id": 17,
+            "name": "Tir \u00e0 l'arc",
+            "time": "12h00",
+            "available": true
+        }],
+        "Sports Collectif": [{
+            "id": 18,
+            "name": "Futsal",
+            "time": "19h00",
+            "available": true
+        }]
+    },
+    "Mercredi": {
+        "Fitness": [{
+            "id": 19,
+            "name": "Zumba",
+            "time": "12h15",
+            "available": true
+        }, {
+            "id": 20,
+            "name": "Body Barre",
+            "time": "18h15",
+            "available": true
+        }],
+        "Bien-\u00eatre": [{
+            "id": 21,
+            "name": "R\u00e9veil Mulculaire",
+            "time": "07h30",
+            "available": true
+        }, {
+            "id": 22,
+            "name": "Stretching",
+            "time": "19h00",
+            "available": true
+        }],
+        "Raquettes": [{
+            "id": 23,
+            "name": "Badminton",
+            "time": "12h00",
+            "available": true
+        }, {
+            "id": 24,
+            "name": "Badminton",
+            "time": "17h00",
+            "available": true
+        }]
+    },
+    "Jeudi": {
+        "Fitness": [{
+            "id": 25,
+            "name": "Circuit Training",
+            "time": "07h30",
+            "available": true
+        }, {
+            "id": 26,
+            "name": "CAF",
+            "time": "13h00",
+            "available": true
+        }, {
+            "id": 27,
+            "name": "Zumba",
+            "time": "17h15",
+            "available": true
+        }, {
+            "id": 28,
+            "name": "Circuit Training",
+            "time": "17h30",
+            "available": true
+        }, {
+            "id": 29,
+            "name": "CAF/Renforcement",
+            "time": "18h00",
+            "available": true
+        }],
+        "Cardio": [{
+            "id": 30,
+            "name": "Cardio Boxing",
+            "time": "12h15",
+            "available": true
+        }],
+        "Sports Collectif": [{
+            "id": 31,
+            "name": "Futsal",
+            "time": "12h00",
+            "available": true
+        }, {
+            "id": 32,
+            "name": "Basket",
+            "time": "18h00",
+            "available": true
+        }]
+    },
+    "Vendredi": {
+        "Raquettes": [{
+            "id": 33,
+            "name": "Badminton",
+            "time": "12h00",
+            "available": true
+        }]
+    }
+}

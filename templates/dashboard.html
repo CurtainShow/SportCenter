@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Manutan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        manutan: {
+                            blue: '#006EFF',
+                            pink: '#FF69B4',
+                            yellow: '#FFD700',
+                            green: '#32CD32',
+                            orange: '#FFA500',
+                            purple: '#8A2BE2'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8">
+        <img src="{{ url_for('static', filename='logo-manutan.png') }}" alt="Manutan Logo" class="w-64 mb-8">
+        
+        <div class="w-full max-w-6xl bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome,</h1>
+                <p class="text-xl text-manutan-blue font-semibold">{{ name }}</p>
+            </div>
+
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Today's Activities</h2>
+                
+                {% if sports %}
+                <div class="space-y-8">
+                    {% for category, activities in sports.items() %}
+                        <div class="bg-gray-50 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4 
+                                {% if category == 'Fitness' %}text-manutan-blue
+                                {% elif category == 'Bien-être' %}text-manutan-green
+                                {% elif category == 'Raquettes' %}text-manutan-orange
+                                {% elif category == 'Équilibre & Concentration' %}text-manutan-purple
+                                {% elif category == 'Cardio' %}text-manutan-pink
+                                {% else %}text-manutan-yellow{% endif %}">
+                                {{ category }}
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {% for activity in activities %}
+                                    {% if activity.available %}
+                                        <div 
+                                            class="activity-card group relative p-4 rounded-lg shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer
+                                            {% if category == 'Fitness' %}bg-manutan-blue hover:bg-blue-600
+                                            {% elif category == 'Bien-être' %}bg-manutan-green hover:bg-green-600
+                                            {% elif category == 'Raquettes' %}bg-manutan-orange hover:bg-orange-600
+                                            {% elif category == 'Équilibre & Concentration' %}bg-manutan-purple hover:bg-purple-600
+                                            {% elif category == 'Cardio' %}bg-manutan-pink hover:bg-pink-600
+                                            {% else %}bg-manutan-yellow hover:bg-yellow-600{% endif %}"
+                                            data-sport="{{ activity.name }}"
+                                            data-category="{{ category }}"
+                                            data-time="{{ activity.time }}">
+                                            <div class="text-white">
+                                                <p class="font-semibold text-lg mb-2">{{ activity.name }}</p>
+                                                <p class="text-sm opacity-90">{{ activity.time }}</p>
+                                            </div>
+                                            <div class="absolute top-2 right-2 hidden check-icon">
+                                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div 
+                                            class="p-4 rounded-lg bg-gray-300 cursor-not-allowed opacity-70">  <!-- Style grisé pour les activités non cliquables -->
+                                            <div class="text-gray-600">
+                                                <p class="font-semibold text-lg mb-2">{{ activity.name }}</p>
+                                                <p class="text-sm opacity-90">{{ activity.time }}</p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center text-gray-600">No activities scheduled for today</p>
+            {% endif %}
+            </div>
+
+            <div class="text-center mt-8 space-y-4">
+                <button id="submitActivities"
+                    class="inline-block px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition duration-200">
+                    Valider les activités sélectionnées
+                </button>
+                
+                <div class="mt-4">
+                    <a href="{{ url_for('logout') }}"
+                        class="inline-block px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition duration-200">
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            let selectedActivities = [];
+
+            // Gestion de la sélection des activités
+            $('.activity-card').click(function() {
+                $(this).toggleClass('selected');
+                $(this).find('.check-icon').toggleClass('hidden');
+                
+                const activityData = {
+                    sport: $(this).data('sport'),
+                    category: $(this).data('category'),
+                    time: $(this).data('time')
+                };
+
+                if ($(this).hasClass('selected')) {
+                    selectedActivities.push(activityData);
+                } else {
+                    selectedActivities = selectedActivities.filter(activity => 
+                        !(activity.sport === activityData.sport && 
+                          activity.category === activityData.category && 
+                          activity.time === activityData.time)
+                    );
+                }
+            });
+
+            // Gestion du submit
+            $('#submitActivities').click(function() {
+                if (selectedActivities.length === 0) {
+                    alert('Veuillez sélectionner au moins une activité');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/log_activity',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        activities: selectedActivities
+                    }),
+                    success: function(response) {
+                        if (response.redirect) {
+                            window.location.href = response.redirect;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .activity-card.selected {
+            border: 2px solid white;
+        }
+        .check-icon {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</body>
+</html>

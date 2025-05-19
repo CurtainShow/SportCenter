@@ -1,0 +1,249 @@
+<!-- dashboard_coach.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Coach - Manutan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        manutan: {
+                            blue: '#006EFF',
+                            pink: '#FF69B4',
+                            yellow: '#FFD700',
+                            green: '#32CD32',
+                            orange: '#FFA500',
+                            purple: '#8A2BE2'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8">
+        <img src="{{ url_for('static', filename='logo-manutan.png') }}" alt="Manutan Logo" class="w-64 mb-8">
+
+        <div class="w-full max-w-6xl bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-8">Bienvenue, Coach {{ name }}</h1>
+            
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Liste des utilisateurs</h2>
+            <table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-xs leading-normal">
+                        <th class="py-3 px-6 text-left">UID</th>
+                        <th class="py-3 px-6 text-left">Name</th>
+                        <th class="py-3 px-6 text-left">Role</th>
+                        <th class="py-3 px-6 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    {% for uid, user in users.items() %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 text-left">{{ uid }}</td>
+                        <td class="py-3 px-6 text-left">
+                            <form method="POST" action="{{ url_for('update_user', uid=uid) }}">
+                                <input type="text" name="name" value="{{ user.name }}" class="w-full border border-gray-300 rounded px-2 py-1">
+                        </td>
+                        <td class="py-3 px-6 text-left">{{ user.role }}</td>
+                        <td class="py-3 px-6 text-left">
+                            <select name="role" class="border border-gray-300 rounded">
+                                <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+                                <option value="coach" {% if user.role == 'coach' %}selected{% endif %}>Coach</option>
+                            </select>
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+            </br>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Ajouter un oublie</h2>
+                        
+            <!-- Ajout du nouveau formulaire -->
+            <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Enregistrer une activité</h3>
+                <form id="activityForm" class="space-y-4">
+                    <div>
+                        <label for="userName" class="block text-sm font-medium text-gray-700 mb-2">Prénom et Nom</label>
+                        <input type="text" id="userName" name="userName" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-manutan-blue focus:border-manutan-blue">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sports disponibles</label>
+                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                            {% for category, activities in todays_sports.items() %}
+                                <div class="ml-2">
+                                    <p class="font-semibold text-gray-600">{{ category }}</p>
+                                    {% for activity in activities %}
+                                        {% if activity.available %}
+                                        <div class="flex items-center ml-4">
+                                            <input type="checkbox" 
+                                                id="activity-{{ activity.id }}"
+                                                name="selectedActivities"
+                                                value="{{ activity.id }}"
+                                                data-sport="{{ activity.name }}"
+                                                data-category="{{ category }}"
+                                                data-time="{{ activity.time }}"
+                                                class="h-4 w-4 text-manutan-blue focus:ring-manutan-blue border-gray-300 rounded">
+                                            <label for="activity-{{ activity.id }}" class="ml-2 block text-sm text-gray-600">
+                                                {{ activity.name }} - {{ activity.time }}
+                                            </label>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                            class="w-full bg-manutan-blue hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-200">
+                        Enregistrer les activités
+                    </button>
+                </form>
+            </div>
+
+            <!-- Ajout du script JavaScript -->
+            <script>
+            document.getElementById('activityForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const userName = document.getElementById('userName').value;
+                const selectedActivities = [];
+                
+                document.querySelectorAll('input[name="selectedActivities"]:checked').forEach(checkbox => {
+                    selectedActivities.push({
+                        sport: checkbox.dataset.sport,
+                        category: checkbox.dataset.category,
+                        time: checkbox.dataset.time
+                    });
+                });
+
+                if (selectedActivities.length === 0) {
+                    alert('Veuillez sélectionner au moins une activité');
+                    return;
+                }
+
+                fetch('/log_activity_coach', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user: userName,
+                        activities: selectedActivities
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue lors de l\'enregistrement des activités');
+                });
+            });
+            </script>
+
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 mt-8">Liste des sports disponibles aujourd'hui</h2>
+            <table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-xs leading-normal">
+                        <th class="py-3 px-6 text-left">Catégorie</th>
+                        <th class="py-3 px-6 text-left">Nom de l'activité</th>
+                        <th class="py-3 px-6 text-left">Heure</th>
+                        <th class="py-3 px-6 text-left">Statut</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    {% for category, activities in todays_sports.items() %}
+                        <tr>
+                            <td colspan="4" class="py-3 px-6 font-semibold text-lg">{{ category }}</td>
+                        </tr>
+                        {% for activity in activities %}
+                        <tr class="{% if not activity.available %}line-through text-gray-400{% endif %} border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left">{{ category }}</td>
+                            <td class="py-3 px-6 text-left">{{ activity.name }}</td>
+                            <td class="py-3 px-6 text-left">{{ activity.time }}</td>
+                            <td class="py-3 px-6 text-left">
+                                <form method="POST" action="{{ url_for('toggle_activity', day='Mercredi', category=category, activity_id=activity.id) }}">
+                                    <button type="submit" class="text-white font-semibold py-1 px-3 rounded {% if activity.available %} bg-red-500 hover:bg-red-600 {% else %} bg-green-500 hover:bg-green-600 {% endif %}">
+                                        {% if activity.available %} Rendre indisponible {% else %} Rendre disponible {% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if loop.last == false %}
+                        <tr>
+                            <td colspan="4" class="border-t border-gray-400 my-2"></td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 mt-8">Liste des messages d'information stockés</h2>
+            <table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-xs leading-normal">
+                        <th class="py-3 px-6 text-left">Texte</th>
+                        <th class="py-3 px-6 text-left">Date de début</th>
+                        <th class="py-3 px-6 text-left">Date de fin</th>
+                        <th class="py-3 px-6 text-left">Couleur</th>
+                        <th class="py-3 px-6 text-left">MAJ</th>
+                        <th class="py-3 px-6 text-left">Suppression</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600 text-sm font-light">
+                    {% for message in messages %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <form method="POST" action="{{ url_for('update_message', message_id=message.id) }}">
+                            <td class="py-3 px-6 text-left"><input type="text" name="text" value="{{ message.text }}" class="border border-gray-300 rounded px-2 py-1 w-full"></td>
+                            <td class="py-3 px-6 text-left"><input type="text" name="start_date" value="{{ message.start_date }}" class="border border-gray-300 rounded px-2 py-1 w-full"></td>
+                            <td class="py-3 px-6 text-left"><input type="text" name="end_date" value="{{ message.end_date }}" class="border border-gray-300 rounded px-2 py-1 w-full"></td>
+                            <td class="py-3 px-6 text-left"><input type="text" name="color" value="{{ message.color }}" class="border border-gray-300 rounded px-2 py-1 w-full"></td>
+                            <td class="py-3 px-6 text-left">
+                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded">Update</button>
+                            </td>
+                        </form>
+                        <form method="POST" action="{{ url_for('delete_message', message_id=message.id) }}" style="display:inline;">
+                            <td class="py-3 px-6 text-left">
+                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">Delete</button>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                    <!-- Ligne pour ajouter un nouveau message -->
+                    <tr>
+                        <form method="POST" action="{{ url_for('add_message') }}">
+                            <td class="py-3 px-6 text-left"><input type="text" name="text" placeholder="Nouveau message" class="border border-gray-300 rounded px-2 py-1 w-full"></td>
+                            <td class="py-3 px-6 text-left"><input type="text" name="start_date" placeholder="DD/MM/YYYY" class="border border-gray-300 rounded px-2 py-1 w-full"></td>
+                            <td class="py-3 px-6 text-left"><input type="text" name="end_date" placeholder="DD/MM/YYYY" class="border border-gray-300 rounded px-2 py-1 w-full"></td>
+                            <td class="py-3 px-6 text-left"><input type="text" name="color" placeholder="Couleur" class="border border-gray-300 rounded px-2 py-1 w-full"></td>
+                            <td class="py-3 px-6 text-left">
+                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded">Ajouter</button>
+                            </td>
+                        </form>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center mt-6">
+                <a href="{{ url_for('logout') }}" class="inline-block px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition duration-200">Logout</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

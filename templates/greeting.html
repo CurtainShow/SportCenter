@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bonne séance! - Manutan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <img src="{{ url_for('static', filename='logo-manutan.png') }}" alt="Manutan Logo" class="w-64 mb-8 fade-in">
+        
+        <div class="text-center fade-in">
+            <h1 class="text-4xl font-bold text-manutan-blue mb-4">Bonne séance {{ name }}!</h1>
+            <p class="text-xl text-gray-600">Profitez bien de votre activité</p>
+        </div>
+        {% if paid == false %}
+        </br>
+        <div>
+            <p class="text-xl text-gray-600">Pensez à payer votre cotisation au Centre Sportif à la Consiergerie. Merci !</p>
+        </div>
+
+        {% endif %}
+    </div>
+
+    <script>
+        // Animation confetti
+        function throwConfetti() {
+            var end = Date.now() + (2 * 1000);
+
+            (function frame() {
+                confetti({
+                    particleCount: 7,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#006EFF', '#FF69B4', '#FFD700', '#32CD32', '#FFA500']
+                });
+                confetti({
+                    particleCount: 7,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#006EFF', '#FF69B4', '#FFD700', '#32CD32', '#FFA500']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // Lancer les confettis au chargement
+        throwConfetti();
+
+        // Redirection après 3 secondes
+        setTimeout(() => {
+            window.location.href = "{{ url_for('index') }}";
+        }, 5000);
+    </script>
+</body>
+</html>
