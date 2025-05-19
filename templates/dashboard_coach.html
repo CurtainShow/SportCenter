@@ -178,7 +178,7 @@
                             <td class="py-3 px-6 text-left">{{ activity.name }}</td>
                             <td class="py-3 px-6 text-left">{{ activity.time }}</td>
                             <td class="py-3 px-6 text-left">
-                                <form method="POST" action="{{ url_for('toggle_activity', day='Mercredi', category=category, activity_id=activity.id) }}">
+                                <form method="POST" action="{{ url_for('toggle_activity', day='Lundi', category=category, activity_id=activity.id) }}">
                                     <button type="submit" class="text-white font-semibold py-1 px-3 rounded {% if activity.available %} bg-red-500 hover:bg-red-600 {% else %} bg-green-500 hover:bg-green-600 {% endif %}">
                                         {% if activity.available %} Rendre indisponible {% else %} Rendre disponible {% endif %}
                                     </button>

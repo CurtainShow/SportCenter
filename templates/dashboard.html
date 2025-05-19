@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +13,7 @@
                         manutan: {
                             blue: '#006EFF',
                             pink: '#FF69B4',
-                            yellow: '#FFD700',
+                            yellow: '#59595a',
                             green: '#32CD32',
                             orange: '#FFA500',
                             purple: '#8A2BE2'
@@ -24,88 +25,93 @@
     </script>
 </head>
 <body class="bg-gray-50">
-    <div class="min-h-screen flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8">
-        <img src="{{ url_for('static', filename='logo-manutan.png') }}" alt="Manutan Logo" class="w-64 mb-8">
+    <div class="h-screen flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="pt-4 px-4 flex justify-center">
+            <img src="{{ url_for('static', filename='logo-manutan.png') }}" alt="Manutan Logo" class="h-60">
+        </header>
         
-        <div class="w-full max-w-6xl bg-white rounded-lg shadow-lg p-8">
-            <div class="text-center mb-8">
-                <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome,</h1>
-                <p class="text-xl text-manutan-blue font-semibold">{{ name }}</p>
-            </div>
-
-            <div class="mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Today's Activities</h2>
-                
-                {% if sports %}
-                <div class="space-y-8">
-                    {% for category, activities in sports.items() %}
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <h3 class="text-lg font-semibold mb-4 
-                                {% if category == 'Fitness' %}text-manutan-blue
-                                {% elif category == 'Bien-être' %}text-manutan-green
-                                {% elif category == 'Raquettes' %}text-manutan-orange
-                                {% elif category == 'Équilibre & Concentration' %}text-manutan-purple
-                                {% elif category == 'Cardio' %}text-manutan-pink
-                                {% else %}text-manutan-yellow{% endif %}">
-                                {{ category }}
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {% for activity in activities %}
-                                    {% if activity.available %}
-                                        <div 
-                                            class="activity-card group relative p-4 rounded-lg shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer
-                                            {% if category == 'Fitness' %}bg-manutan-blue hover:bg-blue-600
-                                            {% elif category == 'Bien-être' %}bg-manutan-green hover:bg-green-600
-                                            {% elif category == 'Raquettes' %}bg-manutan-orange hover:bg-orange-600
-                                            {% elif category == 'Équilibre & Concentration' %}bg-manutan-purple hover:bg-purple-600
-                                            {% elif category == 'Cardio' %}bg-manutan-pink hover:bg-pink-600
-                                            {% else %}bg-manutan-yellow hover:bg-yellow-600{% endif %}"
-                                            data-sport="{{ activity.name }}"
-                                            data-category="{{ category }}"
-                                            data-time="{{ activity.time }}">
-                                            <div class="text-white">
-                                                <p class="font-semibold text-lg mb-2">{{ activity.name }}</p>
-                                                <p class="text-sm opacity-90">{{ activity.time }}</p>
-                                            </div>
-                                            <div class="absolute top-2 right-2 hidden check-icon">
-                                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div 
-                                            class="p-4 rounded-lg bg-gray-300 cursor-not-allowed opacity-70">  <!-- Style grisé pour les activités non cliquables -->
-                                            <div class="text-gray-600">
-                                                <p class="font-semibold text-lg mb-2">{{ activity.name }}</p>
-                                                <p class="text-sm opacity-90">{{ activity.time }}</p>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endfor %}
+        <!-- Main Content -->
+        <main class="flex-1 px-8 py-8 overflow-hidden">
+            <div class="h-full bg-white rounded-lg shadow-lg p-4 flex flex-col"> <!-- bg-white shadow-lg-->
+                <!-- Welcome Message -->
+                <div class="text-center mb-2">
+                    <h1 class="text-2xl font-bold text-gray-800">Bienvenue, <span class="text-manutan-blue">{{ name }}</span></h1>
                 </div>
-            {% else %}
-                <p class="text-center text-gray-600">No activities scheduled for today</p>
-            {% endif %}
-            </div>
 
-            <div class="text-center mt-8 space-y-4">
-                <button id="submitActivities"
-                    class="inline-block px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition duration-200">
-                    Valider les activités sélectionnées
-                </button>
-                
-                <div class="mt-4">
+                <!-- Activities Section -->
+                <div class="flex-1 overflow-hidden">
+                    <h2 class="text-lg font-bold text-gray-800 mb-2 text-center">Activitées du jour sur ce créneau :</h2>
+                    
+                    {% if sports %}
+                    <div class="h-full overflow-y-auto px-1 pb-2 activities-container">
+                        {% for category, activities in sports.items() %}
+                            <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                                <h3 class="text-lg font-semibold mb-2 
+                                    {% if category == 'Fitness' %}text-manutan-blue
+                                    {% elif category == 'Bien-être' %}text-manutan-green
+                                    {% elif category == 'Raquettes' %}text-manutan-orange
+                                    {% elif category == 'Équilibre & Concentration' %}text-manutan-purple
+                                    {% elif category == 'Cardio' %}text-manutan-pink
+                                    {% else %}text-manutan-yellow{% endif %}">
+                                    {{ category }}
+                                </h3>
+                                <div class="grid grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {% for activity in activities %}
+                                        {% if activity.available %}
+                                            <div 
+                                                class="activity-card group relative p-3 rounded-lg shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg cursor-pointer
+                                                {% if category == 'Fitness' %}bg-manutan-blue hover:bg-blue-600
+                                                {% elif category == 'Bien-être' %}bg-manutan-green hover:bg-green-600
+                                                {% elif category == 'Raquettes' %}bg-manutan-orange hover:bg-orange-600
+                                                {% elif category == 'Équilibre & Concentration' %}bg-manutan-purple hover:bg-purple-600
+                                                {% elif category == 'Cardio' %}bg-manutan-pink hover:bg-pink-600
+                                                {% else %}bg-manutan-yellow hover:bg-black-600{% endif %}"
+                                                data-sport="{{ activity.name }}"
+                                                data-category="{{ category }}"
+                                                data-time="{{ activity.time }}">
+                                                <div class="text-white">
+                                                    <p class="font-semibold text-sm sm:text-base mb-1">{{ activity.name }}</p>
+                                                    <p class="text-xs sm:text-sm opacity-90">{{ activity.time }}</p>
+                                                </div>
+                                                <div class="absolute top-2 right-2 hidden check-icon">
+                                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="p-3 rounded-lg bg-gray-300 cursor-not-allowed opacity-70">
+                                                <div class="text-gray-600">
+                                                    <p class="font-semibold text-l l:text-base mb-1">{{ activity.name }}</p>
+                                                    <p class="text-m m:text-sm opacity-90">{{ activity.time }}</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                        <p class="text-center text-gray-600">No activities scheduled for today</p>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-center space-x-4 pt-2 mb-3">
+                    <button id="submitActivities"
+                        class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-xl rounded-lg transition duration-200">
+                        Valider les activités sélectionnées
+                    </button>
+                    
                     <a href="{{ url_for('logout') }}"
-                        class="inline-block px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition duration-200">
+                        class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xl font-medium rounded-lg transition duration-200">
                         Logout
                     </a>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
@@ -159,9 +165,35 @@
     </script>
 
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .activities-container {
+            scrollbar-width: thin;  /* Pour Firefox */
+            scrollbar-color: rgba(156, 163, 175, 0.5) transparent;  /* Pour Firefox */
+        }
+        
+        .activities-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .activities-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .activities-container::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 20px;
+        }
+
         .activity-card.selected {
             border: 2px solid white;
         }
+        
         .check-icon {
             transition: all 0.2s ease-in-out;
         }
