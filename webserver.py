@@ -122,14 +122,17 @@ def get_todays_sports2():
 
     # Récupération du jour actuel et de l'heure actuelle
     current_day = days[datetime.now().weekday()]
-    #print(current_day)
+    print(current_day)
 
     #current_day = 'Lundi'
     current_time = datetime.now().strftime("%Hh%M")
     #current_time = '12h00'
+    print(current_time)
 
     # Chargement du planning des sports
     schedule = get_sports_schedule()
+
+    #print(schedule)
 
     # Vérifier si le jour existe dans le planning
     if current_day not in schedule:
@@ -138,7 +141,7 @@ def get_todays_sports2():
     # Filtrage des activités selon la plage horaire (1h avant, 3h après)
     def is_within_time_range(event_time):
         event_dt = datetime.strptime(event_time, "%Hh%M")
-        lower_bound = (datetime.strptime(current_time, "%Hh%M") - timedelta(hours=1))
+        lower_bound = (datetime.strptime(current_time, "%Hh%M") - timedelta(hours=3))
         upper_bound = (datetime.strptime(current_time, "%Hh%M") + timedelta(hours=3))
         return lower_bound <= event_dt <= upper_bound
 
@@ -165,10 +168,15 @@ def get_sports_on_day_time(day, test_time):
 
     # Vérification sur la plage horaire (1h avant, 3h après)
     def is_within_time_range(event_time):
-        event_dt = datetime.strptime(event_time, "%Hh%M")
-        lower_bound = (datetime.strptime(test_time, "%Hh%M") - timedelta(hours=1))
-        upper_bound = (datetime.strptime(test_time, "%Hh%M") + timedelta(hours=3))
-        return lower_bound <= event_dt <= upper_bound
+        # Convertir les heures en minutes pour faciliter la comparaison
+        event_minutes = int(event_time.split('h')[0]) * 60 + int(event_time.split('h')[1])
+        test_minutes = int(test_time.split('h')[0]) * 60 + int(test_time.split('h')[1])
+        
+        # Calculer les bornes en minutes
+        lower_bound = test_minutes - 180  # 3 heure avant
+        upper_bound = test_minutes + 180  # 3 heures après
+        
+        return lower_bound <= event_minutes <= upper_bound
 
     filtered_schedule = {
         category: [
@@ -234,25 +242,110 @@ def read_badge():
             return jsonify({"status": "unrecognized", "redirect": url_for('register')})
     return jsonify(result)
 
+def load_users_from_csv():
+    users = []
+    with open('data/utilisateurs.csv', 'r', encoding='utf-8') as file:
+        reader = csv.DictReader(file, delimiter=';')
+        for row in reader:
+            if row['inscrit'] == 'True' and row.get('created', 'False') != 'True':
+                users.append({
+                    'nom': row['nom'],
+                    'prenom': row['prenom'],
+                    'email': row['email'],
+                    'inscrit': row['inscrit'],
+                    'created': row.get('created', 'False')
+                })
+    return users
+
+def update_user_created(nom, prenom):
+    rows = []
+    with open('data/utilisateurs.csv', 'r', encoding='utf-8') as file:
+        reader = csv.DictReader(file, delimiter=';')
+        fieldnames = reader.fieldnames + ['created'] if 'created' not in reader.fieldnames else reader.fieldnames
+        for row in reader:
+            if row['nom'] == nom and row['prenom'] == prenom:
+                row['created'] = 'True'
+            rows.append(row)
+    
+    with open('data/utilisateurs.csv', 'w', encoding='utf-8', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames, delimiter=';')
+        writer.writeheader()
+        writer.writerows(rows)
+
+@app.route('/search_users')
+def search_users():
+    term = request.args.get('term', '').lower()
+    users = load_users_from_csv()
+    results = []
+    
+    for user in users:
+        full_name = f"{user['nom']} {user['prenom']}"
+        if term in full_name.lower():
+            results.append({
+                'label': full_name,
+                'value': full_name
+            })
+    
+    return jsonify(results)
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if 'pending_uid' not in session:
         return redirect(url_for('index'))
     
     if request.method == 'POST':
-        name = request.form.get('name')
+        full_name = request.form.get('name')
+        nom, prenom = full_name.split(' ', 1)  # Sépare le nom et le prénom
         uid = session.pop('pending_uid')
         
-        users = load_users()
-        # Ajouter le rôle "user" par défaut
-        users[uid] = {'name': name, 'role': 'user'}
+        # Récupérer le statut d'inscription depuis le CSV
+        is_paid = False
+        user_found = False
         
+        # Lire le fichier CSV pour vérifier si l'utilisateur existe
+        with open('data/utilisateurs.csv', 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file, delimiter=';')
+            fieldnames = reader.fieldnames
+            rows = list(reader)
+            
+            for row in rows:
+                if row['nom'] == nom and row['prenom'] == prenom:
+                    is_paid = row['inscrit'] == 'True'
+                    user_found = True
+                    row['created'] = 'True'
+                    break
+        
+        # Si l'utilisateur n'existe pas, l'ajouter au CSV
+        if not user_found:
+            new_row = {
+                'nom': nom,
+                'prenom': prenom,
+                'email': '',
+                'inscrit': 'False',
+                'created': 'True'
+            }
+            rows.append(new_row)
+            
+            # Réécrire le fichier CSV avec le nouvel utilisateur
+            with open('data/utilisateurs.csv', 'w', encoding='utf-8', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames, delimiter=';')
+                writer.writeheader()
+                writer.writerows(rows)
+        
+        # Enregistrer l'utilisateur dans le JSON
+        users = load_users()
+        users[uid] = {
+            'name': full_name, 
+            'role': 'user',
+            'paid': is_paid
+        }
         save_users(users)
         
-        session['user'] = name
-        # Ajout du role dans la session 
+        # Mettre à jour la session
+        session['user'] = full_name
         session['role'] = 'user'
-
+        session['paid'] = is_paid
+        
         return redirect(url_for('dashboard'))
     
     return render_template('register.html')
@@ -265,13 +358,14 @@ def dashboard():
     # Vérifiez le rôle de l'utilisateur
     users = load_users()
     messages = load_messages()
-    current_uid = session['uid']  # Utilisez l'UID de la session
+    #current_uid = session['uid']  # Utilisez l'UID de la session
     
-    user_data = users.get(current_uid)  # Utilisez get() pour éviter KeyError
+    #user_data = users.get(current_uid)  # Utilisez get() pour éviter KeyError
 
-    if user_data and user_data['role'] == 'coach':
+    #if user_data and user_data['role'] == 'coach':
+
+    if session.get('role') == 'coach':
         todays_sports = get_todays_sports()
-        #print(todays_sports)
         messages = load_messages_test()
         return render_template('dashboard_coach.html', name=session['user'], users=users, todays_sports=todays_sports, messages=messages)
     else:

@@ -1,22 +1,17 @@
 {
     "[164, 235, 0, 29]": {
-        "name": "Laura Le Coz", 
+        "name": "Laura Le Coz",
         "role": "user",
         "paid": true
-    }, 
+    },
     "[61, 86, 73, 47]": {
-        "name": "test User", 
+        "name": "test User",
         "role": "user",
         "paid": false
-    }, 
+    },
     "[85, 251, 217, 79]": {
-        "name": "test Coach", 
+        "name": "test Coach",
         "role": "coach",
-        "paid": true
-    }, 
-    "[20, 0, 118, 124]": {
-        "name": "Antony Troubadour Terrestre", 
-        "role": "user",
         "paid": true
     }
 }

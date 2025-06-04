@@ -3,6 +3,9 @@
 <head>
     <title>Register User - Manutan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen flex flex-col items-center justify-start py-12 px-4 sm:px-6 lg:px-8">
@@ -10,12 +13,12 @@
         
         <div class="w-full max-w-md">
             <div class="bg-white py-8 px-4 shadow-lg rounded-lg sm:px-10">
-                <h1 class="text-2xl font-bold text-gray-800 text-center mb-8">Register New User</h1>
+                <h1 class="text-2xl font-bold text-gray-800 text-center mb-8">Enregistrer un nouveau participant</h1>
                 
                 <form method="POST" class="space-y-6">
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700">
-                            Name/Surname
+                            Nom/Prénom
                         </label>
                         <div class="mt-1">
                             <input type="text" id="name" name="name" required
@@ -25,11 +28,31 @@
 
                     <button type="submit"
                         class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Register
+                        Enregistrer
                     </button>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#name").autocomplete({
+                source: function(request, response) {
+                    $.getJSON("/search_users", {
+                        term: request.term
+                    }, response);
+                },
+                minLength: 2,
+                select: function(event, ui) {
+                    $("#name").val(ui.item.value);
+                }
+            }).autocomplete("instance")._renderItem = function(ul, item) {
+                return $("<li>")
+                    .append("<div>" + item.label + "</div>")
+                    .appendTo(ul);
+            };
+        });
+    </script>
 </body>
 </html>
