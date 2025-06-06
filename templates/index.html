@@ -13,6 +13,28 @@
         .fade-in.visible {
             opacity: 1;
         }
+
+                    /* Désactiver la sélection de texte */
+        body {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+        }
+            
+            /* Cacher la barre de défilement */
+        ::-webkit-scrollbar {
+                display: none;
+        }
+            
+        /* Forcer le plein écran */
+        html, body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                height: 100vh;
+                width: 100vw;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -58,6 +80,49 @@
     </div>
 
     <script>
+        // Fonction pour forcer le mode plein écran
+        function enterFullScreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Fonction pour vérifier si on est en plein écran
+        function isFullScreen() {
+            return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+        }
+
+        // Entrer en plein écran au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            enterFullScreen();
+        });
+
+        // Vérifier et forcer le plein écran si nécessaire
+        document.addEventListener('fullscreenchange', function() {
+            if (!isFullScreen()) {
+                enterFullScreen();
+            }
+        });
+
+        // Désactiver le clic droit
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Désactiver les raccourcis clavier
+        document.addEventListener('keydown', function(e) {
+            // Autoriser uniquement les touches nécessaires
+            const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'é', 'è', 'ê', 'ë', 'à', 'â', 'ô', 'ö', 'ù', 'û', 'ü', 'ç', ' ', '-', "'"];
+            if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
+            }
+        });
+
         $(document).ready(function() {
             // Appliquer le fade-in effect en ajoutant 'visible' à chaque composant après un léger délai
             $('.fade-in').each(function(i) {

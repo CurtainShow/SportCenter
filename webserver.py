@@ -152,7 +152,11 @@ def get_todays_sports2():
         for category, events in schedule[current_day].items()
     }
 
-    filtered_schedule["Sport en Autonomie"] = [{'id': 97, 'name': 'Course à pied', 'time': '07h00 - 20h00', 'available': True},{'id': 98, 'name': 'Musculation', 'time': '07h00 - 20h00', 'available': True}, {'id': 99, 'name': 'Cardio', 'time': '07h00 - 20h00', 'available': True}]
+    filtered_schedule["Sport en Autonomie"] = [{'id': 97, 'name': 'Course à pied', 'time': '07h00 - 20h00', 'available': True},
+                                             {'id': 98, 'name': 'Musculation', 'time': '07h00 - 20h00', 'available': True}, 
+                                             {'id': 99, 'name': 'Cardio', 'time': '07h00 - 20h00', 'available': True}, 
+                                             {'id': 100, 'name': 'Tennis de table', 'time': '07h00 - 20h00', 'available': True}, 
+                                             {'id': 101, 'name': 'Squash', 'time': '07h00 - 20h00', 'available': True}]
 
     print(filtered_schedule)
 
@@ -210,7 +214,11 @@ def get_todays_sports():
         sorted_schedule[category] = sorted_activities
     #print(sorted_schedule)
 
-    sorted_schedule["Sport en Autonomie"] = [{'id': 97, 'name': 'Course à pied', 'time': '07h00 - 20h00', 'available': True},{'id': 98, 'name': 'Musculation', 'time': '07h00 - 20h00', 'available': True}, {'id': 99, 'name': 'Cardio', 'time': '07h00 - 20h00', 'available': True}]
+    sorted_schedule["Sport en Autonomie"] = [{'id': 97, 'name': 'Course à pied', 'time': '07h00 - 20h00', 'available': True},
+                                             {'id': 98, 'name': 'Musculation', 'time': '07h00 - 20h00', 'available': True}, 
+                                             {'id': 99, 'name': 'Cardio', 'time': '07h00 - 20h00', 'available': True}, 
+                                             {'id': 100, 'name': 'Tennis de table', 'time': '07h00 - 20h00', 'available': True}, 
+                                             {'id': 101, 'name': 'Squash', 'time': '07h00 - 20h00', 'available': True}]
 
     return sorted_schedule
 
